@@ -174,6 +174,7 @@ static void advertising_init(void)
  */
 static void led_write_handler(ble_lbs_t * p_lbs, uint8_t led_state)
 {
+    NRF_LOG_PRINTF("led_write %hu\r\n", led_state);
     if (led_state)
     {
         LEDS_ON(LEDBUTTON_LED_PIN);
@@ -288,6 +289,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
+	    NRF_LOG_PRINTF("connected\r\n");
             LEDS_ON(CONNECTED_LED_PIN);
             LEDS_OFF(ADVERTISING_LED_PIN);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
@@ -297,6 +299,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
+	    NRF_LOG_PRINTF("disconnected\r\n");
             LEDS_OFF(CONNECTED_LED_PIN);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
@@ -401,6 +404,7 @@ static void button_event_handler(uint8_t pin_no, uint8_t button_action)
             {
                 APP_ERROR_CHECK(err_code);
             }
+	    NRF_LOG_PRINTF("button\r\n");
             break;
 
         default:
@@ -442,7 +446,13 @@ static void power_manage(void)
  */
 int main(void)
 {
+    uint32_t err_code;
+
     // Initialize.
+    err_code = NRF_LOG_INIT();
+    APP_ERROR_CHECK(err_code);
+    NRF_LOG_PRINTF("Initializing!\r\n");
+    
     leds_init();
     timers_init();
     buttons_init();
@@ -456,6 +466,7 @@ int main(void)
     advertising_start();
 
     // Enter main loop.
+    NRF_LOG_PRINTF("Main loop!\r\n");
     for (;;)
     {
         power_manage();
