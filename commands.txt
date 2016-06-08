@@ -1,0 +1,5 @@
+picocom -b 115200 -f n /dev/ttyACM0
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/rad2/workspace/ble/tools/nrfjprog
+make
+make flash
+make flash_softdevice #for some examples
