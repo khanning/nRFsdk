@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "nrf_delay.h"
 #include "app_error.h"
@@ -91,6 +92,10 @@ ret_code_t tag_data_read(uint8_t * buffer, uint32_t buffer_size)
         return NRF_ERROR_NOT_FOUND;
     }
 
+    app_trace_log("Tag read, len=%d\r\n", uid_length);
+    app_trace_log("Tag uid: ");
+    print_hex(uid, uid_length);
+
     if (uid_length != TAG_TYPE_2_UID_LENGTH)
     {
         return NRF_ERROR_NOT_SUPPORTED;
@@ -107,6 +112,9 @@ ret_code_t tag_data_read(uint8_t * buffer, uint32_t buffer_size)
         }
     }
 
+    app_trace_log("Page 0-4 content: ");
+    print_hex(buffer, 4*i);
+    
     uint16_t data_bytes_in_tag = TAG_TYPE_2_DATA_AREA_MULTIPLICATOR *
                                      buffer[TAG_TYPE_2_DATA_AREA_SIZE_OFFSET];
 
@@ -222,12 +230,17 @@ int main(void)
 
     utils_setup();
 
+    app_trace_log("Initializing nfc\r\n");
     err_code = adafruit_pn532_init(false);
     APP_ERROR_CHECK(err_code);
 
     for (;;)
     {
+        app_trace_log("Main loop\r\n");
+        LEDS_OFF(BSP_LED_0_MASK);
         err_code = tag_data_read(tag_data, TAG_DATA_BUFFER_SIZE);
+        app_trace_log("Scan result %d\r\n", err_code);
+        LEDS_ON(BSP_LED_0_MASK);
         switch(err_code)
         {
             case NRF_SUCCESS:
